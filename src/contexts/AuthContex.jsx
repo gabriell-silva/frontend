@@ -25,10 +25,31 @@ export function AuthProvider({ children }) {
           path: "/",
         });
 
-        setUser({ ...user });
+        setUser({ ...data.user });
 
         api.defaults.headers["Authorization"] = `Bearer ${data.token}`;
 
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
+  const signUp = (dataForm) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await api.post("/register", {
+          email: dataForm.email,
+          login: dataForm.login,
+          date_birth: dataForm.date_birth,
+          name: dataForm.name,
+          level: dataForm.level,
+          password: dataForm.password,
+          password_confirmation: dataForm.password_confirmation,
+        });
+
+        console.log(response);
         resolve();
       } catch (error) {
         reject(error);
@@ -41,7 +62,7 @@ export function AuthProvider({ children }) {
       try {
         const { user, token } = await api.get("/user/profile");
 
-        setUser(user);
+        setUser({ ...user });
 
         setCookie(undefined, "rachinha.token", token, {
           path: "/",
@@ -93,7 +114,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, signIn, signOut, updateUser }}
+      value={{ user, isAuthenticated, signIn, signOut, updateUser, signUp }}
     >
       {children}
     </AuthContext.Provider>
